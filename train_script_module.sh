@@ -18,7 +18,9 @@
     # LOG_PATH=$2
     # N_STEP=$3
     # N_ENV=$4
-    TEST_NAME="test04"
+    #TEST_NAME="test06"
+    TEST_NAME="$(date +"%F-%H-%M-%S")"
+    #echo $TEST_NAME
     MODEL_SAVE_PATH=$(printf "%s/%s" "./model" "$TEST_NAME")
     LOG_PATH=$(printf "%s/%s" "./log" "$TEST_NAME")
     echo $MODEL_SAVE_PATH
