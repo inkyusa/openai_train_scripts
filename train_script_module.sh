@@ -25,6 +25,10 @@
     echo $MODEL_SAVE_PATH
     echo $LOG_PATH
     rm -rf $LOG_PATH
+    lockFile="/home/enddl22/workspace/venv-p3.6/lib/python3.6/site-packages/mujoco_py/generated/mujocopy-buildlock.lock"
+    if [ -f $lockFile ] ; then
+    rm $lockFile
+    fi
 
     N_STEP=8000
     N_TIMESTEPS=20e6 #50e6
