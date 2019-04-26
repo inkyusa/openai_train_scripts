@@ -10,6 +10,14 @@ then
     #exit 1
 elif [ "$#" -eq 1 ]
 then
-	MODEL_PATH=$1
-	python -m baselines.run --num_timesteps=0 --play --env=QuadRate-v0
+	RL_BASELINES_ZOO_PATH=/home/enddl22/workspace/rl-baselines-zoo
+	INPUT_MODEL_PATH1=$1
+    INPUT_MODEL_PATH2=${INPUT_MODEL_PATH#"./"}
+    echo $test
+
+    CURR_DIR=$PWD
+	cd $RL_BASELINES_ZOO_PATH
+	MODEL_PATH=$(printf "%s/%s" "$CURR_DIR" "$INPUT_MODEL_PATH2")
+	python enjoy.py --algo ppo2 --folder $MODEL_PATH -n 1000 --env QuadRate-v0
+	cd $CURR_DIR
 fi
