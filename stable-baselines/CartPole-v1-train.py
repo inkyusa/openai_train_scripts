@@ -50,15 +50,41 @@ def evaluate(model, num_steps=1000):
     return mean_100ep_reward
 
 env_id = 'CartPole-v1'
-env = gym.make(env_id)
-env = DummyVecEnv([lambda: env])
+num_cpu = 8 # Number of processes to use
+env = SubprocVecEnv([make_env(env_id, i) for i in range(num_cpu)])
 
-model = PPO2.load("ppo2_ratequad")
+model = PPO2(MlpPolicy, env, verbose=1)
+before_train_mean_reward = evaluate(model, num_steps=10000)
+
+n_timesteps = 25000
+
+# Multiprocessed RL Training
+start_time = time.time()
+model.learn(n_timesteps)
+total_time_multi = time.time() - start_time
+
+print("Took {:.2f}s for multiprocessed version - {:.2f} FPS".format(total_time_multi, n_timesteps / total_time_multi))
+
+# Single Process RL Training
+single_process_model = PPO2(MlpPolicy, DummyVecEnv([lambda: gym.make(env_id)]), verbose=0)
+
+start_time = time.time()
+single_process_model.learn(n_timesteps)
+total_time_single = time.time() - start_time
+
+print("Took {:.2f}s for single process version - {:.2f} FPS".format(total_time_single, n_timesteps / total_time_single))
+
+print("Multiprocessed training is {:.2f}x faster!".format(total_time_single / total_time_multi))
+
+
+
+
+model.save("ppo2_ratequad")
 mean_reward = evaluate(model, num_steps=10000)
 
-obs = env.reset()
-for i in range(1000):
-    action, _states = model.predict(obs)
-    obs, rewards, dones, info = env.step(action)
-    env.render()
+# obs = env.reset()
+# for i in range(1000):
+#     action, _states = model.predict(obs)
+#     obs, rewards, dones, info = env.step(action)
+#     env.render()
 

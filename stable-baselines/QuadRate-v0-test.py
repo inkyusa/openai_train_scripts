@@ -1,9 +1,27 @@
 import gym
 
 from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.common.vec_env import DummyVecEnv
+from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines import PPO2
+from stable_baselines.common import set_global_seeds
 import numpy as np
+import time
+
+def make_env(env_id, rank, seed=0):
+    """
+    Utility function for multiprocessed env.
+    
+    :param env_id: (str) the environment ID
+    :param num_env: (int) the number of environment you wish to have in subprocesses
+    :param seed: (int) the inital seed for RNG
+    :param rank: (int) index of the subprocess
+    """
+    def _init():
+        env = gym.make(env_id)
+        env.seed(seed + rank)
+        return env
+    set_global_seeds(seed)
+    return _init
 
 def evaluate(model, num_steps=1000):
     """
@@ -31,19 +49,16 @@ def evaluate(model, num_steps=1000):
     print("Mean reward:", mean_100ep_reward, "Num episodes:", len(episode_rewards))
     return mean_100ep_reward
 
-env = gym.make('QuadRate-v0')
-env = DummyVecEnv([lambda: env])  # The algorithms require a vectorized environment to run
+env_id = 'QuadRate-v0'
+env = gym.make(env_id)
+env = DummyVecEnv([lambda: env])
 
-model = PPO2(MlpPolicy, env, verbose=1)
-before_train_mean_reward = evaluate(model, num_steps=10000)
-
-model.learn(total_timesteps=10000) #1e7)
-model.save("ppo2_ratequad")
+model = PPO2.load("ppo2_ratequad")
 mean_reward = evaluate(model, num_steps=10000)
 
-# obs = env.reset()
-# for i in range(1000):
-#     action, _states = model.predict(obs)
-#     obs, rewards, dones, info = env.step(action)
-#     env.render()
+obs = env.reset()
+for i in range(1000):
+    action, _states = model.predict(obs)
+    obs, rewards, dones, info = env.step(action)
+    env.render()
 
