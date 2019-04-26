@@ -1,7 +1,7 @@
 import gym
 
 from stable_baselines.common.policies import MlpPolicy
-from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
+from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv,VecNormalize
 from stable_baselines import PPO2
 from stable_baselines.common import set_global_seeds
 import numpy as np
@@ -34,12 +34,12 @@ def evaluate(model, num_steps=1000):
     print("Mean reward:", mean_100ep_reward, "Num episodes:", len(episode_rewards))
     return mean_100ep_reward
 
+model_path="./model/ppo2_ratequad_20190426-18-20-51/"
 env_id = 'QuadRate-v0'
 env = gym.make(env_id)
 env = DummyVecEnv([lambda: env])
-
-model_name="./model/ppo2_ratequad_20190426-16-29-07.pkl"
-model = PPO2.load(model_name)
+env.load_running_average(model_path)
+model = PPO2.load(model_path+"model.pkl")
 #mean_reward = evaluate(model, num_steps=10000)
 
 obs = env.reset()
