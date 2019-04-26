@@ -5,7 +5,7 @@ from stable_baselines.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines import PPO2
 from stable_baselines.common import set_global_seeds
 import numpy as np
-import time
+import time, os, datetime
 
 def make_env(env_id, rank, seed=0):
     """
@@ -49,37 +49,38 @@ def evaluate(model, num_steps=1000):
     print("Mean reward:", mean_100ep_reward, "Num episodes:", len(episode_rewards))
     return mean_100ep_reward
 
+model_dir = "./model/"
+os.makedirs(model_dir, exist_ok=True)
+model_name = "ppo2_cartpole_{:%Y%m%d-%H-%M-%S}".format(datetime.datetime.now())
+
 env_id = 'CartPole-v1'
 num_cpu = 8 # Number of processes to use
 env = SubprocVecEnv([make_env(env_id, i) for i in range(num_cpu)])
 
-model = PPO2(MlpPolicy, env, verbose=1)
+model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="./log/")
 before_train_mean_reward = evaluate(model, num_steps=10000)
 
-n_timesteps = 25000
+n_timesteps = 100000
 
 # Multiprocessed RL Training
 start_time = time.time()
-model.learn(n_timesteps)
+model.learn(n_timesteps, tb_log_name=model_name)
 total_time_multi = time.time() - start_time
 
 print("Took {:.2f}s for multiprocessed version - {:.2f} FPS".format(total_time_multi, n_timesteps / total_time_multi))
 
-# Single Process RL Training
-single_process_model = PPO2(MlpPolicy, DummyVecEnv([lambda: gym.make(env_id)]), verbose=0)
+# # Single Process RL Training
+# single_process_model = PPO2(MlpPolicy, DummyVecEnv([lambda: gym.make(env_id)]), verbose=0)
 
-start_time = time.time()
-single_process_model.learn(n_timesteps)
-total_time_single = time.time() - start_time
+# start_time = time.time()
+# single_process_model.learn(n_timesteps)
+# total_time_single = time.time() - start_time
 
-print("Took {:.2f}s for single process version - {:.2f} FPS".format(total_time_single, n_timesteps / total_time_single))
+# print("Took {:.2f}s for single process version - {:.2f} FPS".format(total_time_single, n_timesteps / total_time_single))
 
-print("Multiprocessed training is {:.2f}x faster!".format(total_time_single / total_time_multi))
+# print("Multiprocessed training is {:.2f}x faster!".format(total_time_single / total_time_multi))
 
-
-
-
-model.save("ppo2_ratequad")
+model.save(model_dir+model_name)
 mean_reward = evaluate(model, num_steps=10000)
 
 # obs = env.reset()

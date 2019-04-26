@@ -6,22 +6,7 @@ from stable_baselines import PPO2
 from stable_baselines.common import set_global_seeds
 import numpy as np
 import time
-
-def make_env(env_id, rank, seed=0):
-    """
-    Utility function for multiprocessed env.
-    
-    :param env_id: (str) the environment ID
-    :param num_env: (int) the number of environment you wish to have in subprocesses
-    :param seed: (int) the inital seed for RNG
-    :param rank: (int) index of the subprocess
-    """
-    def _init():
-        env = gym.make(env_id)
-        env.seed(seed + rank)
-        return env
-    set_global_seeds(seed)
-    return _init
+best_mean_reward, n_steps = -np.inf, 0
 
 def evaluate(model, num_steps=1000):
     """
@@ -53,8 +38,9 @@ env_id = 'QuadRate-v0'
 env = gym.make(env_id)
 env = DummyVecEnv([lambda: env])
 
-model = PPO2.load("ppo2_ratequad")
-mean_reward = evaluate(model, num_steps=10000)
+model_name="./model/ppo2_ratequad_20190426-16-29-07.pkl"
+model = PPO2.load(model_name)
+#mean_reward = evaluate(model, num_steps=10000)
 
 obs = env.reset()
 for i in range(1000):

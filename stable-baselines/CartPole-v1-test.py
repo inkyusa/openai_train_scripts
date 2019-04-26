@@ -52,8 +52,8 @@ def evaluate(model, num_steps=1000):
 env_id = 'CartPole-v1'
 env = gym.make(env_id)
 env = DummyVecEnv([lambda: env])
-
-model = PPO2.load("ppo2_ratequad")
+model_name="./model/ppo2_cartpole_20190426-16-04-50.pkl"
+model = PPO2.load(model_name)
 mean_reward = evaluate(model, num_steps=10000)
 
 obs = env.reset()
