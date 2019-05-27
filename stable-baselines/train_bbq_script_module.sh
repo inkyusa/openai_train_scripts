@@ -27,12 +27,12 @@
     #echo $LOG_PATH
     #rm -rf $LOG_PATH
     CURR_DIR=$PWD
-    lockFile="/home/enddl22/workspace/venv-p3.6/lib/python3.6/site-packages/mujoco_py/generated/mujocopy-buildlock.lock"
+    lockFile="/home/enddl22/workspace/mujoco-py/mujoco_py/generated/mujocopy-buildlock.lock"
     if [ -f $lockFile ] ; then
     rm $lockFile
     fi
     cd $RL_BASELINES_ZOO_PATH
-    python train.py --algo ppo2 --env BallBouncingQuad-v0 --tensorboard-log ~/workspace/openai_train_scripts/stable-baselines/log/ --log-folder ~/workspace/openai_train_scripts/stable-baselines/model
+    OPENAI_LOG_FORMAT=tensorboard,stdout python train.py --algo ppo2 --env BallBouncingQuad-v0 --tensorboard-log ~/workspace/openai_train_scripts/stable-baselines/log/ --log-folder ~/workspace/openai_train_scripts/stable-baselines/model
     cd $CURR_DIR
     #activation = tf.tanh or tf.nn.relu
 

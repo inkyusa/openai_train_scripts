@@ -18,7 +18,6 @@ then
 	MODEL_PATH=$(printf "%s/%s" "$CURR_DIR" "$INPUT_MODEL_PATH2")
     $echo $MODEL_PATH
 	python enjoy.py --algo ppo2 --folder $MODEL_PATH -n 10000 --env QuadRate-v0
-	#python enjoy.py --algo ppo2 --folder $MODEL_PATH -n 1000 --env BallBouncingQuad-v0
     
     cd $CURR_DIR
 fi
