@@ -5,7 +5,7 @@ then
 	echo "====================================================================="
     echo "This script will test trained model                                  "
     echo "Usage : source test_script.sh <model path>"
-    echo "e.g., source test_script.sh ~/workspace/model/quad-10M               "
+    echo "e.g., source test_script.sh ./model                                  "
     echo "====================================================================="
     #exit 1
 elif [ "$#" -eq 1 ]
